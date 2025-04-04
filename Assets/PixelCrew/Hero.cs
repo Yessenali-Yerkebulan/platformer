@@ -1,38 +1,49 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Hero : MonoBehaviour
 {
-    private float _horizontalDirection;
-    private float _verticalDirection;
-    [SerializeField] private float _speed;
+    private Vector2 _direction;
+    private Rigidbody2D _rigidbody2D;
     
-    public void SetHorizontalDirection(float horizontalDirection)
+    [SerializeField] private float _speed;
+    [SerializeField] private float _jumpSpeed;
+
+    [SerializeField] private LayerCheck _groundCheck;
+
+    private void Awake()
     {
-        _horizontalDirection = horizontalDirection;
+        _rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
-    public void SetVerticalDirection(float verticalDirection)
+    public void SetDirection(Vector2 dir)
     {
-        _verticalDirection = verticalDirection;
+        _direction = dir;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        if (_horizontalDirection != 0)
-        {
-            var delta = _horizontalDirection * _speed * Time.deltaTime;
-            var newXPosition = transform.position.x + delta;
-            transform.position = new Vector3(newXPosition, transform.position.y, transform.position.z);
-        }
+        _rigidbody2D.velocity = new Vector2(_direction.x * _speed, _rigidbody2D.velocity.y);
 
-        if (_verticalDirection != 0)
+        var isJumping = _direction.y > 0;
+        if (isJumping)
         {
-            var delta = _verticalDirection * _speed * Time.deltaTime;
-            var newYPosition = transform.position.y + delta;
-            transform.position = new Vector3(transform.position.x, newYPosition, transform.position.z);
+            if (IsGrounded())
+            {
+                _rigidbody2D.AddForce(Vector2.up * _jumpSpeed, ForceMode2D.Impulse);
+
+            }
+        } else if (_rigidbody2D.velocity.y > 0)
+        {
+            _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x, _rigidbody2D.velocity.y * 0.5f);
         }
+    }
+
+    private bool IsGrounded()
+    {
+        return _groundCheck.IsTouchingLayer;
     }
 
     public void SaySomething()

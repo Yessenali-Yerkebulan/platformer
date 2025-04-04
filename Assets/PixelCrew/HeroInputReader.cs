@@ -10,11 +10,9 @@ public class HeroInputReader : MonoBehaviour
     private void Awake()
     {
         _inputActions = new HeroInputAction();
-        _inputActions.Hero.HorizontalMovement.performed += OnHorizontalMovement;
-        _inputActions.Hero.HorizontalMovement.canceled += OnHorizontalMovement;
-        _inputActions.Hero.VerticalMovement.performed += OnVerticalMovement;
-        _inputActions.Hero.VerticalMovement.canceled += OnVerticalMovement;
         _inputActions.Hero.SaySomething.performed += OnSaySomething;
+        _inputActions.Hero.movement.performed += OnMovement;
+        _inputActions.Hero.movement.canceled += OnMovement;
     }
 
     private void OnEnable()
@@ -22,17 +20,12 @@ public class HeroInputReader : MonoBehaviour
         _inputActions.Enable();
     }
     
-    private void OnHorizontalMovement(InputAction.CallbackContext context)
+    private void OnMovement(InputAction.CallbackContext context)
     {
-        var direction = context.ReadValue<float>();
-        _hero.SetHorizontalDirection(direction);
+        Vector2 direction = context.ReadValue<Vector2>();
+        _hero.SetDirection(direction);
     }
-
-    private void OnVerticalMovement(InputAction.CallbackContext context)
-    {
-        var direction = context.ReadValue<float>();
-        _hero.SetVerticalDirection(direction);
-    }
+    
 
     private void OnSaySomething(InputAction.CallbackContext context)
     {
